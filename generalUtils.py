@@ -156,6 +156,8 @@ def readableMods(__mods):
 		r += "SO"
 	if __mods & mods.RELAX > 0:
 		r += "RX"
+	if __mods & mods.AUTOPLAY > 0:
+		r += "AP"
 
 	return r
 
