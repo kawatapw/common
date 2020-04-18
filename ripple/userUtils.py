@@ -178,7 +178,7 @@ def getUserStatsAP(userID, gameMode):
 							FROM ap_stats WHERE id = %s LIMIT 1""".format(gm=modeForDB), [userID])
 
 	# Get game rank
-	stats["gameRank"] = getGameRankAp(userID, gameMode)
+	stats["gameRank"] = getGameRankAP(userID, gameMode)
 
 	# Return stats + game rank
 	return stats
