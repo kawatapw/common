@@ -39,6 +39,24 @@ def noPPLimit(userID, relax):
 
 def whitelistUserPPLimit(userID, rx):
 	glob.db.execute("UPDATE {rx}_stats SET unrestricted_pp = 1 WHERE id = {userid}".format(rx='rx' if rx else 'users', userid=userID))
+
+#created ap variands
+def PPBoardAP(userID):
+	result = glob.db.fetch("SELECT ppboard FROM ap_stats WHERE id = {userid}".format(userid=userID))
+	return result['ppboard']
+
+def setPPBoardAP(userID):
+	glob.db.execute("UPDATE ap_stats SET ppboard = 1 WHERE id = {userid}".format(userid=userID))
+
+def setScoreBoardAP(userID):
+	glob.db.execute("UPDATE ap_stats SET ppboard = 0 WHERE id = {userid}".format(userid=userID))
+
+def noPPLimitAP(userID):
+	result = glob.db.fetch("SELECT unrestricted_pp FROM ap_stats WHERE id = {userid}".format(userid=userID))
+	return result['unrestricted_pp']
+
+def whitelistUserPPLimitAP(userID):
+	glob.db.execute("UPDATE ap_stats SET unrestricted_pp = 1 WHERE id = {userid}".format(userid=userID))
  
 def incrementPlaytime(userID, gameMode=0, length=0):
 	modeForDB = gameModes.getGameModeForDB(gameMode)
@@ -65,7 +83,7 @@ def incrementPlaytimeAP(userID, gameMode=0, length=0):
 	else:
 		print("Something went wrong...")	  
  
-
+#rel was here
 def getUserStats(userID, gameMode):
 	"""
 	Get all user stats relative to `gameMode`

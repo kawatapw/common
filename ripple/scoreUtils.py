@@ -65,4 +65,6 @@ def readableMods(m):
 		r += "TD"
 	if m & mods.RELAX > 0:
 		r += "RX"
+	if m & mods.RELAX2 > 0:
+		r += "AP"
 	return r
