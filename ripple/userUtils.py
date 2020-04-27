@@ -668,7 +668,7 @@ def updatePPAP(userID, gameMode):
 	:param gameMode: game mode number
 	"""
 	glob.db.execute(
-		"UPDATE rx_stats SET pp_{}=%s WHERE id = %s LIMIT 1".format(scoreUtils.readableGameMode(gameMode)),
+		"UPDATE ap_stats SET pp_{}=%s WHERE id = %s LIMIT 1".format(scoreUtils.readableGameMode(gameMode)),
 		(
 			calculatePPAP(userID, gameMode),
 			userID
