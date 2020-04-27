@@ -6,13 +6,17 @@ try:
 except ImportError:
     from MySQLdb._exceptions import ProgrammingError
 
-import objects.beatmap
 from common import generalUtils
 from common.constants import gameModes, mods
 from common.constants import privileges
 from common.log import logUtils as log
 from common.ripple import passwordUtils, scoreUtils
 from objects import glob
+
+try:
+	import objects.beatmap
+except:
+	pass
 
 
 def getBeatmapTime(beatmapID):
