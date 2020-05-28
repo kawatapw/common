@@ -38,7 +38,7 @@
 			"max-rx-pp": 2500,
 			"max-ap-pp": 4000,
 			"score-overwrite": "pp",
-			"loved-dont-give-pp": false,
+			"loved-dont-give-pp": true,
 			"ignore-x-flag": false
 		},
 		"allowed-beatmap-rankstatus": {
