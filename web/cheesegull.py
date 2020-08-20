@@ -37,9 +37,14 @@ def cheesegullRequest(handler, requestType="GET", key="", params=None, mustHave=
 	else:
 		f = requests.get
 		getParams = params
-	result = f("{}/{}".format(glob.conf.config["cheesegull"]["apiurl"], handler), params=getParams, data=postData, headers= {
-		"Authorization": key
-	})
+	try:
+		result = f("{}/{}".format(glob.conf.config["cheesegull"]["apiurl"], handler), params=getParams, data=postData, headers= {
+			"Authorization": key
+		},timeout=2)
+	except:
+		result = f("http://storage.ripple.moe/api/{}".format(handler), params=getParams, data=postData, headers= {
+			"Authorization": key
+		},timeout=2)
 
 	log.debug(result.url)
 	# log.debug(str(result.text))
