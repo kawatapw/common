@@ -22,12 +22,12 @@ except:
 def getBeatmapTime(beatmapID):
 	p = 0
 	try:
-		r = requests.get("https://kacktaube.me/api/cheesegull/b/{}".format(beatmapID)).text
+		r = requests.get(f"https://kacktaube.me/api/cheesegull/b/{beatmapID}", timeout=2).text
 		if r != "null\n":
 			p = json.loads(r)['TotalLength']
 	except: #having backup mirror as having this fail literally kills the server
 		log.warning("The default beatmap mirror doesnt work! Using a backup one.")
-		r = requests.get("http://storage.ripple.moe/api/b/{}".format(beatmapID)).text
+		r = requests.get(f"http://storage.ripple.moe/api/b/{beatmapID}", timeout=2).text
 		if r != "null\n":
 			p = json.loads(r)['TotalLength']
  
