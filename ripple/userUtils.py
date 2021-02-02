@@ -1510,6 +1510,16 @@ def logHardware(userID, hashes, activation = False):
 			perc = (total*10)/100
 
 			if i["occurencies"] >= perc:
+				# Now we check if have a bypass on.
+				user_data = glob.db.fetch(
+					f"SELECT bypass_hwid FROM users WHERE id = {userID} LIMIT 1"
+				)
+
+				# If they are explicitly allowed to multiacc
+				if user_data["bypass_hwid"]:
+					log.warning(f"Allowed user {userID} to bypass hwid check.")
+					return True
+
 				# If the banned user has logged in more than 10% of the times from this user, restrict this user
 				restrict(userID)
 				appendNotes(userID, "Logged in from HWID ({hwid}) used more than 10% from user {banned} ({bannedUserID}), who is banned/restricted.".format(
