@@ -1600,6 +1600,16 @@ def verifyUser(userID, hashes):
 		originalUserID = match[0]["userid"]
 		originalUsername = getUsername(originalUserID)
 
+		# Now we check if have a bypass on.
+		user_data = glob.db.fetchone(
+			f"SELECT bypass_hwid FROM users WHERE id = {userID} LIMIT 1"
+		)
+
+		# If they are explicitly allowed to multiacc
+		if user_data["bypass_hwid"]:
+			log.warning(f"Allowed user {username} to bypass hwid check.")
+			return True
+
 		# Ban this user and append notes
 		ban(userID)	# this removes the USER_PENDING_VERIFICATION flag too
 		appendNotes(userID, "{}'s multiaccount ({}), found HWID match while verifying account ({})".format(originalUsername, originalUserID, hashes[2:5]))
