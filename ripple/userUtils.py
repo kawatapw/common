@@ -1601,7 +1601,7 @@ def verifyUser(userID, hashes):
 		originalUsername = getUsername(originalUserID)
 
 		# Now we check if have a bypass on.
-		user_data = glob.db.fetchone(
+		user_data = glob.db.fetch(
 			f"SELECT bypass_hwid FROM users WHERE id = {userID} LIMIT 1"
 		)
 
