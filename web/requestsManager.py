@@ -6,7 +6,7 @@ import tornado.web
 import tornado.gen
 from tornado.ioloop import IOLoop
 from objects import glob
-from common.log import logUtils as log
+from logger import log
 from raven.contrib.tornado import SentryMixin
 
 class asyncRequestHandler(SentryMixin, tornado.web.RequestHandler):
@@ -63,7 +63,6 @@ def runBackground(data, callback):
 	def _callback(result):
 		IOLoop.instance().add_callback(lambda: callback(result))
 	glob.pool.apply_async(func, args, kwargs, _callback)
-	glob.dog.increment(glob.DATADOG_PREFIX + ".incoming_requests")
 
 def checkArguments(arguments, requiredArguments):
 	"""

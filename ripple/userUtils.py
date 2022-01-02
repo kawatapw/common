@@ -9,8 +9,8 @@ except ImportError:
 from common import generalUtils
 from common.constants import gameModes, mods
 from common.constants import privileges
-from common.log import logUtils as log
-from common.ripple import passwordUtils, scoreUtils
+from logger import log
+from common.ripple import scoreUtils
 from objects import glob
 
 try:
@@ -305,42 +305,6 @@ def exists(userID):
 	:return: True if the user exists, else False
 	"""
 	return True if glob.db.fetch("SELECT id FROM users WHERE id = %s LIMIT 1", [userID]) is not None else False
-
-def checkLogin(userID, password, ip=""):
-	"""
-	Check userID's login with specified password
-
-	:param userID: user id
-	:param password: md5 password
-	:param ip: request IP (used to check active bancho sessions). Optional.
-	:return: True if user id and password combination is valid, else False
-	"""
-	# Check cached bancho session
-	banchoSession = False
-	if ip != "":
-		banchoSession = checkBanchoSession(userID, ip)
-
-	# Return True if there's a bancho session for this user from that ip
-	if banchoSession:
-		return True
-
-	# Otherwise, check password
-	# Get password data
-	passwordData = glob.db.fetch("SELECT password_md5, salt, password_version FROM users WHERE id = %s LIMIT 1", [userID])
-
-	# Make sure the query returned something
-	if passwordData is None:
-		return False
-
-	# Return valid/invalid based on the password version.
-	if passwordData["password_version"] == 2:
-		return passwordUtils.checkNewPassword(password, passwordData["password_md5"])
-	if passwordData["password_version"] == 1:
-		ok = passwordUtils.checkOldPassword(password, passwordData["salt"], passwordData["password_md5"])
-		if not ok:
-			return False
-		newpass = passwordUtils.genBcrypt(password)
-		glob.db.execute("UPDATE users SET password_md5=%s, salt='', password_version='2' WHERE id = %s LIMIT 1", [newpass, userID])
 
 def getRequiredScoreForLevel(level):
 	"""

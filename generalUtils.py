@@ -2,7 +2,7 @@ import string
 import random
 import hashlib
 from functools import partial
-from common.log import logUtils as log
+from logger import log
 
 import dill
 
@@ -137,7 +137,7 @@ def readableMods(__mods):
 	# TODO: same as common.scoreUtils.readableMods. Remove this or the other one.
 	r = ""
 	if __mods == 0:
-		return r
+		return "NM"
 	if __mods & mods.NOFAIL > 0:
 		r += "NF"
 	if __mods & mods.EASY > 0:
@@ -183,3 +183,44 @@ def getTotalSize(o):
 	except:
 		log.error("Error while getting total object size!")
 		return 0
+
+def calc_acc(mode, n300, n100, n50, miss, katu, geki):
+
+	if mode == 0:
+		hits = n300 + n100 + n50 + miss
+
+		if hits == 0:
+			return 0.0
+		else:
+			return 100.0 * (
+					(n50 * 50) +
+					(n100 * 100) +
+					(n300 * 300)
+			) / (hits * 300.0)
+
+	elif mode == 1:
+		hits = n300 + n100 + miss
+
+		if hits == 0:
+			return 0.0
+		else:
+			return 100.0 * ((n100 * 0.5) + n300) / hits
+	elif mode == 2:
+		hits = n300 + n100 + n50 + katu + miss
+
+		if hits == 0:
+			return 0.0
+		else:
+			return 100.0 * (n300 + n100 + n50) / hits
+	elif mode == 3:
+		hits = n300 + n100 + n50 + geki + katu + miss
+
+		if hits == 0:
+			return 0.0
+		else:
+			return 100.0 * (
+					(n50 * 50) +
+					(n100 * 100) +
+					(katu * 200.0) +
+					((n300 + geki) * 300.0)
+			) / (hits * 300.0)

@@ -1,7 +1,6 @@
 import threading
-from common.log import logUtils as log
+from logger import log
 from common.redis import generalPubSubHandler
-from common.sentry import sentry
 
 class listener(threading.Thread):
 	def __init__(self, r, handlers):
@@ -34,7 +33,6 @@ class listener(threading.Thread):
 		self.pubSub.subscribe(channels)
 		log.info("Subscribed to redis pubsub channels: {}".format(channels))
 
-	@sentry.capture()
 	def processItem(self, item):
 		"""
 		Processes a pubSub item by calling channel's handler
