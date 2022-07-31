@@ -79,9 +79,9 @@ def incrementPlaytime(userID, gameMode=0, length=0):
  
 def incrementPlaytimeRX(userID, gameMode=0, length=0):
 	modeForDB = gameModes.getGameModeForDB(gameMode)
-	result = glob.db.fetch("SELECT playtime_{gm} as playtime FROM rx_stats WHERE id = %s".format(gm=modeForDB), [userID])
+	result = glob.db.fetch("SELECT playtime_{gm} as playtime FROM users_stats_relax WHERE id = %s".format(gm=modeForDB), [userID])
 	if result is not None:
-		glob.db.execute("UPDATE rx_stats SET playtime_{gm} = %s WHERE id = %s".format(gm=modeForDB), [(int(result['playtime'])+int(length)), userID])
+		glob.db.execute("UPDATE users_stats_relax SET playtime_{gm} = %s WHERE id = %s".format(gm=modeForDB), [(int(result['playtime'])+int(length)), userID])
 	else:
 		print("Something went wrong...")
 
@@ -148,7 +148,7 @@ def getUserStatsRx(userID, gameMode):
 							playcount_{gm} AS playcount,
 							total_score_{gm} AS totalScore,
 							pp_{gm} AS pp
-							FROM rx_stats WHERE id = %s LIMIT 1""".format(gm=modeForDB), [userID])
+							FROM users_stats_relax WHERE id = %s LIMIT 1""".format(gm=modeForDB), [userID])
 
 	# Get game rank
 	stats["gameRank"] = getGameRankRx(userID, gameMode)
@@ -216,7 +216,7 @@ def getMaxComboRX(userID, gameMode):
 	:return: dictionary with result
 	"""
 	# Get stats
-	maxcombo = glob.db.fetch("SELECT max_combo FROM scores_relax WHERE userid = %s AND play_mode = %s ORDER BY max_combo DESC LIMIT 1", [userID, gameMode])
+	maxcombo = glob.db.fetch("SELECT max_combo FROM scores WHERE userid = %s AND play_mode = %s AND is_relax = 1 ORDER BY max_combo DESC LIMIT 1", [userID, gameMode])
  
 	# Return stats + game rank
 	return maxcombo["max_combo"]
@@ -389,7 +389,7 @@ def updateLevelRX(userID, gameMode=0, totalScore=0):
 	mode = scoreUtils.readableGameMode(gameMode)
 	if totalScore == 0:
 		totalScore = glob.db.fetch(
-			"SELECT total_score_{m} as total_score FROM rx_stats WHERE id = %s LIMIT 1".format(m=mode), [userID])
+			"SELECT total_score_{m} as total_score FROM users_stats_relax WHERE id = %s LIMIT 1".format(m=mode), [userID])
 		if totalScore:
 			totalScore = totalScore["total_score"]
  
@@ -397,7 +397,7 @@ def updateLevelRX(userID, gameMode=0, totalScore=0):
 	level = getLevel(totalScore)
  
 	# Save new level
-	glob.db.execute("UPDATE rx_stats SET level_{m} = %s WHERE id = %s LIMIT 1".format(m=mode), [level, userID]) 
+	glob.db.execute("UPDATE users_stats_relax SET level_{m} = %s WHERE id = %s LIMIT 1".format(m=mode), [level, userID]) 
 
 def updateLevelAP(userID, gameMode=0, totalScore=0):
 	"""
@@ -468,7 +468,7 @@ def calculateAccuracyRX(userID, gameMode):
 	"""
 	# Get best accuracy scores
 	bestAccScores = glob.db.fetchAll(
-		"SELECT accuracy FROM scores_relax WHERE userid = %s AND play_mode = %s AND completed = 3 ORDER BY pp DESC LIMIT 500",
+		"SELECT accuracy FROM scores WHERE userid = %s AND play_mode = %s AND is_relax = 1 AND completed = 3 ORDER BY pp DESC LIMIT 500",
 		[userID, gameMode])
  
 	v = 0
@@ -588,7 +588,7 @@ def updateAccuracyRX(userID, gameMode):
 	"""
 	newAcc = calculateAccuracyRX(userID, gameMode)
 	mode = scoreUtils.readableGameMode(gameMode)
-	glob.db.execute("UPDATE rx_stats SET avg_accuracy_{m} = %s WHERE id = %s LIMIT 1".format(m=mode),
+	glob.db.execute("UPDATE users_stats_relax SET avg_accuracy_{m} = %s WHERE id = %s LIMIT 1".format(m=mode),
 					[newAcc, userID])   
 
 def updateAccuracyAP(userID, gameMode):
@@ -612,7 +612,7 @@ def updatePP(userID, gameMode):
 	:param gameMode: game mode number
 	"""
 	glob.db.execute(
-		"UPDATE users_stats SET pp_{}=%s WHERE id = %s LIMIT 1".format(scoreUtils.readableGameMode(gameMode)),
+		"UPDATE users_stats SET pp_{} = %s WHERE id = %s LIMIT 1".format(scoreUtils.readableGameMode(gameMode)),
 		(
 			calculatePP(userID, gameMode),
 			userID
@@ -724,7 +724,7 @@ def updateStatsRx(userID, score_):
 		realPlayTime = score_.fullPlayTime
 
 	glob.db.execute(
-		"UPDATE rx_stats SET total_score_{m}=total_score_{m}+%s, playcount_{m}=playcount_{m}+1, "
+		"UPDATE users_stats_relax SET total_score_{m}=total_score_{m}+%s, playcount_{m}=playcount_{m}+1, "
 		"playtime_{m} = playtime_{m} + %s "
 		"WHERE id = %s LIMIT 1".format(
             m=mode
@@ -808,7 +808,7 @@ def incrementUserBeatmapPlaycount(userID, gameMode, beatmapID):
 	
 def incrementUserBeatmapPlaycountRX(userID, gameMode, beatmapID):
 	glob.db.execute(
-		"INSERT INTO rx_beatmap_playcount (user_id, beatmap_id, game_mode, playcount) "
+		"INSERT INTO users_beatmap_playcount (user_id, beatmap_id, game_mode, playcount) "
 		"VALUES (%s, %s, %s, 1) ON DUPLICATE KEY UPDATE playcount = playcount + 1",
 		(userID, beatmapID, gameMode)
 	)
@@ -883,7 +883,7 @@ def incrementReplaysWatchedRX(userID, gameMode):
 	"""
 	mode = scoreUtils.readableGameMode(gameMode)
 	glob.db.execute(
-		"UPDATE rx_stats SET replays_watched_{mode}=replays_watched_{mode}+1 WHERE id = %s LIMIT 1".format(
+		"UPDATE users_stats_relax SET replays_watched_{mode}=replays_watched_{mode}+1 WHERE id = %s LIMIT 1".format(
 			mode=mode), [userID])
 
 def incrementReplaysWatchedAP(userID, gameMode):
@@ -1227,7 +1227,7 @@ def getPlaycountRX(userID, gameMode):
 	:return: playcount
 	"""
 	modeForDB = gameModes.getGameModeForDB(gameMode)
-	return glob.db.fetch("SELECT playcount_"+modeForDB+" FROM rx_stats WHERE id = %s LIMIT 1", [userID])["playcount_"+modeForDB]	
+	return glob.db.fetch("SELECT playcount_"+modeForDB+" FROM users_stats_relax WHERE id = %s LIMIT 1", [userID])["playcount_"+modeForDB]	
 
 def getPlaycountAP(userID, gameMode):
 	"""
@@ -1775,7 +1775,7 @@ def updateTotalHitsRX(userID=0, gameMode=gameModes.STD, newHits=0, score=None):
 		gameMode = score.gameMode
 		userID = score.playerUserID
 	glob.db.execute(
-		"UPDATE rx_stats SET total_hits_{gm} = total_hits_{gm} + %s WHERE id = %s LIMIT 1".format(
+		"UPDATE users_stats_relax SET total_hits_{gm} = total_hits_{gm} + %s WHERE id = %s LIMIT 1".format(
 			gm=gameModes.getGameModeForDB(gameMode)
 		),
 		(newHits, userID)
