@@ -1188,7 +1188,7 @@ def getGameRankRx(userID, gameMode):
 	:param gameMode: game mode number
 	:return: game rank
 	"""
-	position = glob.redis.zrevrank("ripple:leaderboard:{}:relax".format(gameModes.getGameModeForDB(gameMode)), userID)
+	position = glob.redis.zrevrank("ripple:leaderboard_relax:{}".format(gameModes.getGameModeForDB(gameMode)), userID)
 	if position is None:
 		return 0
 	else:
@@ -1201,7 +1201,7 @@ def getGameRankAP(userID, gameMode):
 	:param gameMode: game mode number
 	:return: game rank
 	"""
-	position = glob.redis.zrevrank("ripple:leaderboard:{}:ap".format(gameModes.getGameModeForDB(gameMode)), userID) #REMEMBER TO ADD REDIS FOR THIS
+	position = glob.redis.zrevrank("ripple:leaderboard_ap:{}".format(gameModes.getGameModeForDB(gameMode)), userID) #REMEMBER TO ADD REDIS FOR THIS
 	if position is None:
 		return 0
 	else:
@@ -1697,12 +1697,12 @@ def removeFromLeaderboard(userID):
 	country = getCountry(userID).lower()
 	for mode in ["std", "taiko", "ctb", "mania"]:
 		glob.redis.zrem("ripple:leaderboard:{}".format(mode), str(userID))
-		glob.redis.zrem("ripple:leaderboard:{}:relax".format(mode), str(userID))
-		glob.redis.zrem("ripple:leaderboard:{}:ap".format(mode), str(userID))
+		glob.redis.zrem("ripple:leaderboard_relax:{}".format(mode), str(userID))
+		glob.redis.zrem("ripple:leaderboard_ap:{}".format(mode), str(userID))
 		if country is not None and len(country) > 0 and country != "xx":
 			glob.redis.zrem("ripple:leaderboard:{}:{}".format(mode, country), str(userID))
-			glob.redis.zrem("ripple:leaderboard:{}:{}:relax".format(mode, country), str(userID))
-			glob.redis.zrem("ripple:leaderboard:{}:{}:ap".format(mode, country), str(userID))
+			glob.redis.zrem("ripple:leaderboard_relax:{}:{}".format(mode, country), str(userID))
+			glob.redis.zrem("ripple:leaderboard_ap:{}:{}".format(mode, country), str(userID))
 
 def deprecateTelegram2Fa(userID):
 	"""
